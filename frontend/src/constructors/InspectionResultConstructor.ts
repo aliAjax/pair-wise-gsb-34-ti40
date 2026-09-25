@@ -5,6 +5,7 @@ export const createDefaultInspectionResult = (overrides: Partial<InspectionResul
   task_id: 1 as never,
   device_id: 1 as never,
   item_code: "item code 1" as never,
+  item_name: "检查项 1" as never,
   result_status: "IN_PROGRESS" as never,
   measured_value: "measured value 1" as never,
   photo_url: "/mock/photo_url-1.png" as never,

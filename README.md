@@ -2,6 +2,17 @@
 
 面向园区和物业公司的消防设备巡检、隐患整改、维保计划和合规台账系统。
 
+## 班次交接闭环（夜班 → 白班）
+
+夜班巡检员遇到设备临时故障或现场情况变化时，不再只靠口头交接：
+
+1. 交班人在**巡检任务页**或**消防设备台账页**点击「发起交接」，从本人未完成任务中勾选设备与检查项（测到一半的数值、照片、备注会冻结为快照），填写现场说明和接班人预计到场时间，选择接班人。
+2. 交接单进入 `PENDING 待接班确认`：**接班人确认前，交班人随时可撤回**。
+3. 接班人在「待我接班」中核对检查项与留痕后确认，任务负责人自动变更为接班人（`ACCEPTED 已接班`）；交班人撤回则交接失效、任务仍归交班人（`REVOKED 已撤回`）。
+4. 发起、确认、撤回每一步都记录**操作人、操作时间、前后负责人**，在交接单详情的时间线中可查。
+
+接口前缀：`/api/shift-handover`（`GET /sources`、`GET /sources/device/{device_id}`、`GET /receivers`、`POST /`、`POST /{id}/accept`、`POST /{id}/revoke`）。演示环境用请求头 `x-user-id` 模拟当前登录巡检员（前端左侧栏可切换身份，默认 1 = 张夜行，夜班；切换到 2 = 李晨光，白班，即可确认接班）。后端未启动时，前端内置同规则的本地兜底引擎（`mocks/handoverMockEngine.ts`），仅开前端也能走通发起→确认/撤回闭环。
+
 ## 快速启动
 
 ```bash
@@ -57,6 +68,9 @@ backend/src/routes, controllers, services, models, repositories, middlewares, co
 - DeviceType: constants/DeviceType、types/DeviceType、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
 - InspectionStatus: constants/InspectionStatus、types/InspectionStatus、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
 - HazardSeverity: constants/HazardSeverity、types/HazardSeverity、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
+- HandoverStatus（交接状态 PENDING/ACCEPTED/REVOKED）：
+  - 后端：`backend/src/constants/handover_status.py`、`models/shift_handover.py`、`services/shift_handover_service.py`、`constructors/shift_handover_factory.py`、`constants/log_templates.py`、`constants/error_codes.py`、`constants/error_messages.py`、`controllers/shift_handover_controller.py`、`routes/shift_handover_routes.py`、`database/init.sql`（shift_handover / item / event 三张表）、`seed.py`。
+  - 前端：`constants/HandoverStatus.ts`、`constants/ResultStatus.ts`、`constants/errorCodes.ts`、`constants/errorMessages.ts`、`constants/logTemplates.ts`、`types/ShiftHandover.ts`、`types/HandoverSource.ts`、`constructors/ShiftHandoverConstructor.ts`、`api/ShiftHandover.ts`、`stores/ShiftHandoverStore.ts`、`hooks/useHandoverFlow.ts`、`components/handover/*`、`pages/TasksPage.tsx`、`pages/DevicesPage.tsx`。
 
 ## 为什么会牵一发动全身
 

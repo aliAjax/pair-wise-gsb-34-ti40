@@ -28,5 +28,11 @@ LOG_TEMPLATES = {
     "HazardTicket.update",
     "HazardTicket.status",
     "HazardTicket.export"
+  ],
+  "ShiftHandover": [
+    "ShiftHandover.create",
+    "ShiftHandover.accept",
+    "ShiftHandover.revoke",
+    "ShiftHandover.list"
   ]
 }

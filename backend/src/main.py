@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from src.middlewares.auth_middleware import auth_middleware
 from src.middlewares.audit_log_middleware import audit_log_middleware
 from src.routes.building_routes import router as building_router
@@ -6,8 +7,16 @@ from src.routes.fire_device_routes import router as fire_device_router
 from src.routes.inspection_task_routes import router as inspection_task_router
 from src.routes.inspection_result_routes import router as inspection_result_router
 from src.routes.hazard_ticket_routes import router as hazard_ticket_router
+from src.routes.shift_handover_routes import router as shift_handover_router
+from src.routes.inspector_routes import router as inspector_router
 
 app = FastAPI(title="消防设施巡检维保平台")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.middleware("http")(auth_middleware)
 app.middleware("http")(audit_log_middleware)
 
@@ -20,3 +29,5 @@ app.include_router(fire_device_router)
 app.include_router(inspection_task_router)
 app.include_router(inspection_result_router)
 app.include_router(hazard_ticket_router)
+app.include_router(inspector_router)
+app.include_router(shift_handover_router)

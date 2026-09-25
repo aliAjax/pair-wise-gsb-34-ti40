@@ -61,3 +61,54 @@ CREATE TABLE IF NOT EXISTS audit_log (
   target_id TEXT,
   created_at TEXT
 );
+
+CREATE TABLE IF NOT EXISTS inspector (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  shift TEXT,
+  phone TEXT
+);
+
+-- 班次交接单：记录交班人、接班人、现场说明、预计到场时间与生命周期状态
+CREATE TABLE IF NOT EXISTS shift_handover (
+  id INTEGER PRIMARY KEY,
+  code TEXT,
+  task_id INTEGER,
+  building_id INTEGER,
+  handover_from INTEGER,
+  handover_to INTEGER,
+  status TEXT,
+  site_note TEXT,
+  estimated_arrival_at TEXT,
+  created_at TEXT,
+  confirmed_at TEXT,
+  revoked_at TEXT
+);
+
+-- 交接检查项快照：冻结测到一半的数值与照片，避免交接丢失
+CREATE TABLE IF NOT EXISTS shift_handover_item (
+  id INTEGER PRIMARY KEY,
+  handover_id INTEGER,
+  device_id INTEGER,
+  device_code TEXT,
+  device_name TEXT,
+  item_code TEXT,
+  item_name TEXT,
+  result_id INTEGER,
+  measured_value TEXT,
+  photo_url TEXT,
+  note TEXT
+);
+
+-- 交接操作留痕：每一步记录操作人、时间与前后负责人
+CREATE TABLE IF NOT EXISTS shift_handover_event (
+  id INTEGER PRIMARY KEY,
+  handover_id INTEGER,
+  event_type TEXT,
+  actor_id INTEGER,
+  actor_name TEXT,
+  from_owner_id INTEGER,
+  to_owner_id INTEGER,
+  created_at TEXT,
+  remark TEXT
+);
