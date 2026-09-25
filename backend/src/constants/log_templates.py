@@ -28,5 +28,11 @@ LOG_TEMPLATES = {
     "HazardTicket.update",
     "HazardTicket.status",
     "HazardTicket.export"
+  ],
+  "TaskHandover": [
+    "TaskHandover.create",
+    "TaskHandover.confirm",
+    "TaskHandover.withdraw",
+    "TaskHandover.transfer"
   ]
 }

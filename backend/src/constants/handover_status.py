@@ -1,0 +1,1 @@
+HandoverStatus = ["PENDING", "CONFIRMED", "WITHDRAWN"]

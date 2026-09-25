@@ -1,4 +1,4 @@
-import { mockData } from "../mocks/seedData";
+import { getMockState } from "../mocks/mockStore";
 import type { InspectionTask } from "../types/InspectionTask";
 
 const endpoint = "/api/inspection-task";
@@ -12,7 +12,8 @@ export async function listInspectionTask(): Promise<InspectionTask[]> {
       // Local mock fallback keeps the UI available during offline review.
     }
   }
-  return [...(mockData.inspectionTask as unknown as InspectionTask[])];
+  // Fall back to the shared mock store so handover ownership transfers stay visible offline.
+  return getMockState().inspectionTask.map((row) => ({ ...row }));
 }
 
 export async function saveInspectionTask(payload: InspectionTask) {

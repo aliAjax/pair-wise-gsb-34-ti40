@@ -14,12 +14,35 @@ cp .env.example .env && docker compose up -d
 
 后端健康检查：<http://localhost:21103/health>
 
+交接闭环接口示例：
+
+```bash
+# 查看交接单（含勾选检查项与流转事件）
+curl http://localhost:21103/api/task-handover
+# 交班人发起交接（x-user-id 模拟当前登录人）
+curl -X POST http://localhost:21103/api/task-handover \
+  -H 'Content-Type: application/json' -H 'x-user-id: 1' \
+  -d '{"task_id":1,"to_inspector_id":2,"note":"现场说明","expected_arrival_at":"2026-09-25T09:00:00Z","items":[{"result_id":1}]}'
+# 接班人确认 / 交班人撤回
+curl -X POST http://localhost:21103/api/task-handover/1/confirm -H 'x-user-id: 2'
+curl -X POST http://localhost:21103/api/task-handover/1/withdraw -H 'x-user-id: 1'
+```
+
+## 交接班闭环说明
+
+夜班巡检员遇到设备临时故障或现场情况变化时，可在 **巡检任务页** 或 **消防设备台账页** 直接发起交接：
+
+1. 交班人从本人未完成任务（PLANNED / IN_PROGRESS / OVERDUE）中勾选设备和未完成检查项，已测数值与现场照片随交接单一并交接，不会丢失；
+2. 填写现场说明与预计到场时间，选择接班人后提交，交接单进入 `PENDING`；
+3. 接班人确认（`CONFIRMED`）后，任务负责人自动转移给接班人继续处理；确认前交班人可撤回（`WITHDRAWN`）；
+4. 每一步都记录操作人、时间与前后负责人（`handover_event`），页面时间线可回看全部流转。
+
+页面右上角可切换当前登录人（夜班/白班），便于演示「交班人发起 → 接班人确认」完整闭环；后端通过 `x-user-id` 请求头识别操作人。
 
 ## 本地开发方式
 
-- 前端：`cd frontend && npm install && npm run dev`
+- 前端：`cd frontend && npm install && npm run dev`（已配置 `/api` 代理到 `http://localhost:21103`）
 - 后端：进入 `backend` 后按技术栈运行开发命令，接口统一挂在 `/api`。
-
 
 ## 技术栈
 
@@ -57,6 +80,9 @@ backend/src/routes, controllers, services, models, repositories, middlewares, co
 - DeviceType: constants/DeviceType、types/DeviceType、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
 - InspectionStatus: constants/InspectionStatus、types/InspectionStatus、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
 - HazardSeverity: constants/HazardSeverity、types/HazardSeverity、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
+- HandoverStatus（PENDING/CONFIRMED/WITHDRAWN）: `frontend/src/constants/HandoverStatus.ts`、`frontend/src/types/HandoverStatus.ts`、`backend/src/constants/handover_status.py`、`frontend/src/constants/statusText.ts`、`frontend/src/components/common/HandoverStatusTag.tsx`、`backend/src/services/task_handover_service.py`、`frontend/src/mocks/seedData.ts` 与 `backend/src/seed.py`、`database/init.sql` 均有引用。
+- HandoverAction（CREATED/CONFIRMED/WITHDRAWN）: `frontend/src/constants/HandoverAction.ts`、`frontend/src/types/HandoverAction.ts`、`backend/src/constants/handover_action.py`、`frontend/src/components/common/HandoverTimeline.tsx`、`backend/src/services/task_handover_service.py` 均有引用。
+- DeviceStatus（NORMAL/FAULT/MAINTAINING）: `frontend/src/constants/DeviceStatus.ts`、`frontend/src/pages/DevicesPage.tsx`、`frontend/src/mocks/seedData.ts` 与 `backend/src/seed.py` 均有引用。
 
 ## 为什么会牵一发动全身
 

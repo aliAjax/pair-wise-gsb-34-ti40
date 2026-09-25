@@ -61,3 +61,35 @@ CREATE TABLE IF NOT EXISTS audit_log (
   target_id TEXT,
   created_at TEXT
 );
+
+CREATE TABLE IF NOT EXISTS task_handover (
+  id INTEGER PRIMARY KEY,
+  task_id TEXT,
+  from_inspector_id TEXT,
+  to_inspector_id TEXT,
+  note TEXT,
+  expected_arrival_at TEXT,
+  status TEXT,
+  created_at TEXT,
+  confirmed_at TEXT,
+  withdrawn_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS handover_item (
+  id INTEGER PRIMARY KEY,
+  handover_id TEXT,
+  device_id TEXT,
+  item_code TEXT,
+  result_id TEXT
+);
+
+CREATE TABLE IF NOT EXISTS handover_event (
+  id INTEGER PRIMARY KEY,
+  handover_id TEXT,
+  action TEXT,
+  operator_id TEXT,
+  from_owner_id TEXT,
+  to_owner_id TEXT,
+  created_at TEXT,
+  remark TEXT
+);
